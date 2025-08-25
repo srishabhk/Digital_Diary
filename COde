@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My 365 Days Diary</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .diary-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .diary-header {
+            background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            background-size: 300% 300%;
+            animation: gradientShift 6s ease infinite;
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .diary-title {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 2px;
+        }
+
+        .diary-subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+        }
+
+        .diary-content {
+            padding: 30px;
+            position: relative;
+            min-height: 600px;
+        }
+
+        .diary-entry {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .diary-entry.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .date-display {
+            font-size: 1.8em;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .mood-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .mood-btn {
+            font-size: 2em;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+            opacity: 0.5;
+        }
+
+        .mood-btn:hover, .mood-btn.selected {
+            transform: scale(1.2);
+            opacity: 1;
+        }
+
+        .writing-area {
+            position: relative;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .writing-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="lines" x="0" y="0" width="100" height="20" patternUnits="userSpaceOnUse"><line x1="0" y1="15" x2="100" y2="15" stroke="%23e0e0e0" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23lines)"/></svg>');
+            opacity: 0.3;
+            pointer-events: none;
+            border-radius: 15px;
+        }
+
+        .diary-textarea {
+            width: 100%;
+            min-height: 300px;
+            border: none;
+            background: transparent;
+            font-family: 'Georgia', serif;
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #333;
+            resize: vertical;
+            position: relative;
+            z-index: 2;
+        }
+
+        .diary-textarea:focus {
+            outline: none;
+        }
+
+        .diary-textarea::placeholder {
+            color: #aaa;
+            font-style: italic;
+        }
+
+        .entry-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .tags-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 0.9em;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .save-btn {
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .calendar-view {
+            display: none;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            padding: 20px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            font-weight: bold;
+        }
+
+        .calendar-day:hover {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .calendar-day.has-entry {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+
+        .search-container {
+            display: none;
+            padding: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .search-results {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .search-result-item {
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-result-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .floating-decorations {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .decoration {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .stats-view {
+            display: none;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-card {
+            display: inline-block;
+            margin: 10px;
+            padding: 20px;
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+            border-radius: 15px;
+            min-width: 150px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.15;
+            font-size: 8em;
+            color: #ddd;
+            pointer-events: none;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-decorations">
+        <div class="decoration" style="top: 10%; left: 10%; font-size: 3em;">🌸</div>
+        <div class="decoration" style="top: 20%; right: 15%; font-size: 2.5em;">✨</div>
+        <div class="decoration" style="bottom: 30%; left: 20%; font-size: 3.5em;">🦋</div>
+        <div class="decoration" style="top: 60%; right: 25%; font-size: 2em;">🌙</div>
+        <div class="decoration" style="bottom: 15%; right: 10%; font-size: 3em;">🌺</div>
+    </div>
+
+    <div class="diary-container">
+        <div class="diary-header">
+            <h1 class="diary-title">My 365 Days Journey</h1>
+            <p class="diary-subtitle">A year of thoughts, dreams, and memories</p>
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn active" onclick="showView('diary')">📝 Write</button>
+            <button class="nav-btn" onclick="showView('calendar')">📅 Calendar</button>
+            <button class="nav-btn" onclick="showView('search')">🔍 Search</button>
+            <button class="nav-btn" onclick="showView('stats')">📊 Stats</button>
+        </div>
+
+        <div class="diary-content">
+            <div class="watermark">📖</div>
+            
+            <!-- Diary Entry View -->
+            <div id="diary-view" class="diary-entry active">
+                <div class="entry-header">
+                    <div class="date-display" id="current-date"></div>
+                    <div class="mood-selector">
+                        <span>Mood:</span>
+                        <button class="mood-btn" data-mood="happy" onclick="selectMood(this)">😊</button>
+                        <button class="mood-btn" data-mood="sad" onclick="selectMood(this)">😢</button>
+                        <button class="mood-btn" data-mood="excited" onclick="selectMood(this)">🤩</button>
+                        <button class="mood-btn" data-mood="calm" onclick="selectMood(this)">😌</button>
+                        <button class="mood-btn" data-mood="thoughtful" onclick="selectMood(this)">🤔</button>
+                    </div>
+                </div>
+
+                <div class="writing-area">
+                    <textarea 
+                        class="diary-textarea" 
+                        id="diary-text"
+                        placeholder="Dear Diary,&#10;&#10;Today was...&#10;&#10;Write your thoughts, experiences, dreams, and memories here. Let your words flow freely..."
+                    ></textarea>
+                </div>
+
+                <div class="entry-footer">
+                    <input 
+                        type="text" 
+                        class="tags-input" 
+                        id="entry-tags"
+                        placeholder="Add tags (e.g., family, work, travel, dreams...)"
+                    >
+                    <button class="save-btn" onclick="saveEntry()">💾 Save Entry</button>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="nav-btn" onclick="changeDay(-1)">← Previous Day</button>
+                    <button class="nav-btn" onclick="changeDay(1)">Next Day →</button>
+                </div>
+            </div>
+
+            <!-- Calendar View -->
+            <div id="calendar-view" class="calendar-view">
+                <!-- Calendar will be generated by JavaScript -->
+            </div>
+
+            <!-- Search View -->
+            <div id="search-view" class="search-container">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="search-input"
+                    placeholder="Search your diary entries..."
+                    onkeyup="searchEntries()"
+                >
+                <div class="search-results" id="search-results"></div>
+            </div>
+
+            <!-- Stats View -->
+            <div id="stats-view" class="stats-view">
+                <h2 style="margin-bottom: 30px; color: #333;">Your Diary Statistics</h2>
+                <div class="stat-card">
+                    <span class="stat-number" id="total-entries">0</span>
+                    <span>Total Entries</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="current-streak">0</span>
+                    <span>Current Streak</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="total-words">0</span>
+                    <span>Total Words</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="most-mood">😊</span>
+                    <span>Most Common Mood</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        let diaryData = {};
+        
+        // Initialize diary
+        function initDiary() {
+            updateDateDisplay();
+            loadEntry();
+            generateCalendar();
+            updateStats();
+        }
+
+        function updateDateDisplay() {
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('current-date').textContent = 
+                currentDate.toLocaleDateString('en-US', options);
+        }
+
+        function changeDay(direction) {
+            saveCurrentEntry();
+            currentDate.setDate(currentDate.getDate() + direction);
+            updateDateDisplay();
+            loadEntry();
+        }
+
+        function selectMood(button) {
+            document.querySelectorAll('.mood-btn').forEach(btn => 
+                btn.classList.remove('selected'));
+            button.classList.add('selected');
+        }
+
+        function getDateKey() {
+            return currentDate.toISOString().split('T')[0];
+        }
+
+        function saveCurrentEntry() {
+            const text = document.getElementById('diary-text').value;
+            const tags = document.getElementById('entry-tags').value;
+            const selectedMood = document.querySelector('.mood-btn.selected');
+            
+            if (text.trim() || tags.trim() || selectedMood) {
+                const dateKey = getDateKey();
+                diaryData[dateKey] = {
+                    text: text,
+                    tags: tags,
+                    mood: selectedMood ? selectedMood.dataset.mood : null,
+                    date: new Date(currentDate).toISOString()
+                };
+            }
+        }
+
+        function saveEntry() {
+            saveCurrentEntry();
+            updateStats();
+            generateCalendar();
+            
+            // Show success message
+            const saveBtn = document.querySelector('.save-btn');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '✅ Saved!';
+            saveBtn.style.background = 'linear-gradient(45deg, #4ecdc4, #44a08d)';
+            
+            setTimeout(() => {
+                saveBtn.innerHTML = originalText;
+                saveBtn.style.background = 'linear-gradient(45deg, #4ecdc4, #44a08d)';
+            }, 2000);
+        }
+
+        function loadEntry() {
+            const dateKey = getDateKey();
+            const entry = diaryData[dateKey];
+            
+            document.getElementById('diary-text').value = entry ? entry.text || '' : '';
+            document.getElementById('entry-tags').value = entry ? entry.tags || '' : '';
+            
+            // Reset mood selection
+            document.querySelectorAll('.mood-btn').forEach(btn => 
+                btn.classList.remove('selected'));
+            
+            if (entry && entry.mood) {
+                const moodBtn = document.querySelector(`[data-mood="${entry.mood}"]`);
+                if (moodBtn) moodBtn.classList.add('selected');
+            }
+        }
+
+        function showView(viewName) {
+            // Update navigation buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => 
+                btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Hide all views
+            document.querySelectorAll('#diary-view, #calendar-view, #search-view, #stats-view')
+                .forEach(view => {
+                    view.style.display = 'none';
+                    view.classList.remove('active');
+                });
+            
+            // Show selected view
+            const targetView = document.getElementById(`${viewName}-view`);
+            if (viewName === 'calendar') {
+                targetView.style.display = 'grid';
+            } else {
+                targetView.style.display = 'block';
+            }
+            targetView.classList.add('active');
+            
+            if (viewName === 'stats') {
+                updateStats();
+            }
+        }
+
+        function generateCalendar() {
+            const calendar = document.getElementById('calendar-view');
+            calendar.innerHTML = '';
+            
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            // Add month header
+            const monthHeader = document.createElement('div');
+            monthHeader.style.gridColumn = '1 / -1';
+            monthHeader.style.textAlign = 'center';
+            monthHeader.style.fontSize = '1.5em';
+            monthHeader.style.marginBottom = '20px';
+            monthHeader.style.color = '#333';
+            monthHeader.style.fontWeight = 'bold';
+            monthHeader.textContent = new Date(year, month).toLocaleDateString('en-US', 
+                { month: 'long', year: 'numeric' });
+            calendar.appendChild(monthHeader);
+            
+            // Add day headers
+            ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.textContent = day;
+                dayHeader.style.fontWeight = 'bold';
+                dayHeader.style.textAlign = 'center';
+                dayHeader.style.padding = '10px';
+                dayHeader.style.color = '#666';
+                calendar.appendChild(dayHeader);
+            });
+            
+            // Add empty cells for days before month starts
+            const firstDayOfWeek = new Date(year, month, 1).getDay();
+            for (let i = 0; i < firstDayOfWeek; i++) {
+                const emptyDay = document.createElement('div');
+                calendar.appendChild(emptyDay);
+            }
+            
+            // Add days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+                
+                const dayKey = new Date(year, month, day).toISOString().split('T')[0];
+                if (diaryData[dayKey] && diaryData[dayKey].text) {
+                    dayElement.classList.add('has-entry');
+                }
+                
+                dayElement.onclick = () => {
+                    currentDate = new Date(year, month, day);
+                    updateDateDisplay();
+                    loadEntry();
+                    showView('diary');
+                };
+                
+                calendar.appendChild(dayElement);
+            }
+        }
+
+        function searchEntries() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const resultsContainer = document.getElementById('search-results');
+            resultsContainer.innerHTML = '';
+            
+            if (query.trim() === '') return;
+            
+            Object.entries(diaryData).forEach(([dateKey, entry]) => {
+                if ((entry.text && entry.text.toLowerCase().includes(query)) ||
+                    (entry.tags && entry.tags.toLowerCase().includes(query))) {
+                    
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'search-result-item';
+                    
+                    const date = new Date(dateKey);
+                    const excerpt = entry.text.substring(0, 100) + 
+                                  (entry.text.length > 100 ? '...' : '');
+                    
+                    resultItem.innerHTML = `
+                        <h4>${date.toLocaleDateString('en-US', { 
+                            weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' 
+                        })}</h4>
+                        <p>${excerpt}</p>
+                        ${entry.tags ? `<small>Tags: ${entry.tags}</small>` : ''}
+                    `;
+                    
+                    resultItem.onclick = () => {
+                        currentDate = new Date(dateKey);
+                        updateDateDisplay();
+                        loadEntry();
+                        showView('diary');
+                    };
+                    
+                    resultsContainer.appendChild(resultItem);
+                }
+            });
+        }
+
+        function updateStats() {
+            const entries = Object.values(diaryData).filter(entry => entry.text && entry.text.trim());
+            const totalEntries = entries.length;
+            
+            let totalWords = 0;
+            let moodCounts = {};
+            
+            entries.forEach(entry => {
+                if (entry.text) {
+                    totalWords += entry.text.trim().split(/\s+/).length;
+                }
+                if (entry.mood) {
+                    moodCounts[entry.mood] = (moodCounts[entry.mood] || 0) + 1;
+                }
+            });
+            
+            const mostCommonMood = Object.keys(moodCounts).reduce((a, b) => 
+                moodCounts[a] > moodCounts[b] ? a : b, 'happy');
+            
+            // Calculate streak
+            let currentStreak = 0;
+            const today = new Date();
+            let checkDate = new Date(today);
+            
+            while (true) {
+                const dateKey = checkDate.toISOString().split('T')[0];
+                if (diaryData[dateKey] && diaryData[dateKey].text) {
+                    currentStreak++;
+                    checkDate.setDate(checkDate.getDate() - 1);
+                } else {
+                    break;
+                }
+            }
+            
+            document.getElementById('total-entries').textContent = totalEntries;
+            document.getElementById('current-streak').textContent = currentStreak;
+            document.getElementById('total-words').textContent = totalWords;
+            
+            const moodEmojis = {
+                happy: '😊', sad: '😢', excited: '🤩', 
+                calm: '😌', thoughtful: '🤔'
+            };
+            document.getElementById('most-mood').textContent = 
+                moodEmojis[mostCommonMood] || '😊';
+        }
+
+        // Initialize when page loads
+        window.onload = initDiary;
+        
+        // Save entry when leaving page
+        window.onbeforeunload = saveCurrentEntry;
+    </script>
+</body>
+</html>
