@@ -9,7 +9,9 @@ A beautiful, interactive digital diary with mood tracking, search functionality,
 - Statistics dashboard
 - Responsive design for tablets
 
-## Usage
-1. Download or clone the repository
-2. Open `index.html` in your browser
-3. Start writing your daily entries!
+💾 How to Use:
+
+Save the HTML file to your tablet
+Open it in any browser (Chrome, Samsung Internet, etc.)
+Add to home screen for quick access
+Write daily entries and they'll be saved automatically
